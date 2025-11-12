@@ -17,13 +17,6 @@ from app.config import SECRET_KEY, ALGORITHM
 router = APIRouter(prefix="/users",
                    tags=["users"])
 
-
-@router.get("/", response_model=list[UserResponse], status_code=status.HTTP_200_OK)
-async def get_all_active_users(db: AsyncSession = Depends(get_async_db)):
-    stmt = await db.scalars(select(UserModel).where(UserModel.is_active == True))
-    return stmt
-
-
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def create_user(user: UserCreate, db: AsyncSession = Depends(get_async_db)):
     result = await db.scalars(select(UserModel).where(UserModel.email == user.email))
