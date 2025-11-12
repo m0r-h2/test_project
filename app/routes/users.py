@@ -29,9 +29,9 @@ async def create_user(user: UserCreate, db: AsyncSession = Depends(get_async_db)
     result = await db.scalars(select(UserModel).where(UserModel.email == user.email))
     if result.first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail="Email already registered")
+                            detail="Email уже существует")
     if user.password != user.verf_password:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="пароли не совпадают")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Пароли не совпадают")
 
     db_user = UserModel(
         first_name=user.first_name,
@@ -77,7 +77,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSessi
     if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Некорректный Email или пароль",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = create_access_token(data={"sub": user.email, "role": user.role, "id": user.id})
@@ -104,10 +104,10 @@ async def update_account(
 
     await db.refresh(current_user)
 
-    return {"message": "Your data has been updated successfully."}
+    return {"message": "Вы успешно обновили свой аккаунт"}
 
 
-@router.delete("/", response_model=dict, status_code=status.HTTP_200_OK)
+@router.delete("/", status_code=status.HTTP_200_OK)
 async def delete_me_account(password: UserPassword,
                             current_user: UserModel = Depends(get_current_user),
                             db: AsyncSession = Depends(get_async_db)):

@@ -42,7 +42,7 @@ async def update_user_account_id(
     )
     await db.commit()
 
-    return {"message": "Your data has been updated successfully."}
+    return {"message": "Изменения сохранены"}
 
 
 @router.delete("/{account_id}", response_model=dict, status_code=status.HTTP_200_OK)
@@ -51,7 +51,7 @@ async def delete_account_id(account_id: int,
                             current_user: UserModel = Depends(get_current_role_admin),
                             db: AsyncSession = Depends(get_async_db)):
     if not verify_password(password.password, current_user.password_hash):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid password")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Неверный пароль")
 
     stmt = await db.scalars(select(UserModel).where(UserModel.id == account_id,
                                                     UserModel.is_active == True))
